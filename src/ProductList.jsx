@@ -13,15 +13,15 @@ function ProductList() {
     const totalQuantity = useSelector(state => state.cart.totalQuantity);
     
     useEffect(() => {
-    const cartItems = new Set(cart.map(item => item.name));
-    setAddedToCart(
-      cartItems.reduce((acc, name) => {
-        acc[name] = true;
-        return acc;
-      }, {})
-    );
-  }, [cart]); // Sync whenever the cart changes
-
+  const cartItems = new Set(cart.map(item => item.name));
+  setAddedToCart(prevState => {
+    const newState = { ...prevState };
+    cartItems.forEach(name => {
+      newState[name] = true;
+    });
+    return newState;
+  });
+}, [cart]);
 
 
     const plantsArray = [
@@ -237,20 +237,31 @@ function ProductList() {
     padding: '15px',
     display: 'flex',
     justifyContent: 'space-between',
-    alignIems: 'center',
+    alignItems: 'center',
     fontSize: '20px',
-   }
+   };
    const styleObjUl={
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '1100px',
-   }
+   };
    const styleA={
     color: 'white',
     fontSize: '30px',
     textDecoration: 'none',
-   }
+   };
+   // Add CSS for the cart counter
+const cartQuantityStyle = {
+    position: 'absolute',
+    top: '-10px',
+    right: '-10px',
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: '50%',
+    padding: '5px 10px',
+    fontSize: '16px',
+  };
    const handleCartClick = (e) => {
     e.preventDefault();
     setShowCart(true); // Set showCart to true when cart icon is clicked
@@ -281,7 +292,6 @@ const handlePlantsClick = (e) => {
                <div className="luxury">
                <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt="" />
                <a href="/" style={{textDecoration:'none'}}>
-                <span className="cart-quantity">{totalQuantity}</span> {/* Display totalQuantity here */}
                         <div>
                     <h3 style={{color:'white'}}>Paradise Nursery</h3>
                     <i style={{color:'white'}}>Where Green Meets Serenity</i>
@@ -313,7 +323,7 @@ const handlePlantsClick = (e) => {
                                 cursor: addedToCart[plant.name] ? 'not-allowed' : 'pointer', // Change cursor style
   }}
 >
-  {addedToCart[plant.name] ? 'Added' : 'Add to Cart'} {/* Update button text */}
+  {addedToCart[plant.name] ? 'Added to Cart' : 'Add to Cart'} {/* Update button text */}
 </button>
             </div>
             ))}
