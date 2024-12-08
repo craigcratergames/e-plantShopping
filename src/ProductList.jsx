@@ -10,6 +10,18 @@ function ProductList() {
     const [addedToCart, setAddedToCart] = useState({});
     const dispatch = useDispatch();  // Initialize dispatch function
     const cart = useSelector(state => state.cart.items);
+    const totalQuantity = useSelector(state => state.cart.totalQuantity);
+    
+    useEffect(() => {
+    const cartItems = new Set(cart.map(item => item.name));
+    setAddedToCart(
+      cartItems.reduce((acc, name) => {
+        acc[name] = true;
+        return acc;
+      }, {})
+    );
+  }, [cart]); // Sync whenever the cart changes
+
 
 
     const plantsArray = [
@@ -258,17 +270,9 @@ const handlePlantsClick = (e) => {
   dispatch(addItem(product));  // Add item to cart via Redux
   setAddedToCart((prevState) => ({
     ...prevState,
-    [product.id]: true,  // Track by product id
+    [product.name]: true,  // Track by product name
   }));
 };
-
-  const getQuantityInCart = (productId) => {
-  const item = cart.find(item => item.id === productId);
-  return item ? item.quantity : 0;
-};
-
-
-
 
     return (
         <div>
@@ -277,6 +281,7 @@ const handlePlantsClick = (e) => {
                <div className="luxury">
                <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt="" />
                <a href="/" style={{textDecoration:'none'}}>
+                <span className="cart-quantity">{totalQuantity}</span> {/* Display totalQuantity here */}
                         <div>
                     <h3 style={{color:'white'}}>Paradise Nursery</h3>
                     <i style={{color:'white'}}>Where Green Meets Serenity</i>
@@ -302,7 +307,14 @@ const handlePlantsClick = (e) => {
                 <div className="product-title">{plant.name}</div>
                 <div className='product-description'>{plant.description}</div>
                 <div className='product-cost'>{plant.cost}</div>
-                <button  className="product-button" onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+                <button className="product-button" onClick={() => handleAddToCart(plant)}
+                        disabled={addedToCart[plant.name]} // Disable the button if already added
+                        style={{backgroundColor: addedToCart[plant.name] ? 'grey' : '#4CAF50', // Grey out if added
+                                cursor: addedToCart[plant.name] ? 'not-allowed' : 'pointer', // Change cursor style
+  }}
+>
+  {addedToCart[plant.name] ? 'Added' : 'Add to Cart'} {/* Update button text */}
+</button>
             </div>
             ))}
         </div>

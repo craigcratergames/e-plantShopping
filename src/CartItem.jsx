@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateQuantity, addItem, removeItem } from './CartSlice';  // Import the actions
+import { updateQuantity, addItem, removeItem } from './CartSlice';
 import './CartItem.css';
 
 function CartItem({ onContinueShopping }) {
@@ -9,25 +9,29 @@ function CartItem({ onContinueShopping }) {
   // Get cart items from Redux store
   const cartItems = useSelector((state) => state.cart.items);
 
-  // Handle updating the quantity of an item
-  const handleUpdateQuantity = (product, newQuantity) => {
-    // Ensure the new quantity is a valid positive number
-    if (newQuantity > 0) {
-      dispatch(updateQuantity({ product, newQuantity }));
-    }
+  // Handle incrementing the quantity of an item
+  const handleIncrement = (item) => {
+    dispatch(updateQuantity({ product: item, newQuantity: item.quantity + 1 }));
   };
 
-  // Handle adding an item to the cart (if not already added)
-  const handleAddItem = (product) => {
-    const isAlreadyInCart = cartItems.some(item => item.name === product.name);
-    if (!isAlreadyInCart) {
-      dispatch(addItem(product));
+  // Handle decrementing the quantity of an item
+  const handleDecrement = (item) => {
+    if (item.quantity > 1) {
+      dispatch(updateQuantity({ product: item, newQuantity: item.quantity - 1 }));
+    } else {
+      // Remove the item if quantity goes to 0
+      dispatch(removeItem(item));
     }
   };
 
   // Handle removing an item from the cart
-  const handleRemoveItem = (product) => {
-    dispatch(removeItem(product));
+  const handleRemoveItem = (item) => {
+    dispatch(removeItem(item));
+  };
+
+  // Placeholder for checkout functionality
+  const handleCheckoutShopping = () => {
+    alert('Functionality to be added for future reference');
   };
 
   return (
@@ -45,9 +49,9 @@ function CartItem({ onContinueShopping }) {
                 <p>{item.description}</p>
                 <div className="cart-item-price">{item.cost}</div>
                 <div className="cart-item-quantity">
-                  <button onClick={() => handleUpdateQuantity(item, item.quantity - 1)}>-</button>
+                  <button onClick={() => handleDecrement(item)}>-</button>
                   <span>{item.quantity}</span>
-                  <button onClick={() => handleUpdateQuantity(item, item.quantity + 1)}>+</button>
+                  <button onClick={() => handleIncrement(item)}>+</button>
                 </div>
               </div>
               <div className="cart-item-actions">
